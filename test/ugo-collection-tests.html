@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>resumer-element</title>
+
+    <!-- Import dependencies -->
+    <script src="../../webcomponentsjs/webcomponents.min.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+    <link rel="import" href="../ugo-collection.html">
+    <link rel="import" href="../../ugo-resumer/ugo-resumer.html">
+</head>
+
+<body>
+
+<form id="form">
+    <ugo-collection id="typical" createText="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+        <div id="item_0" ugo-collection-item><ugo-resumer><h2>Item 0</h2><input type="text" resumer-item id="text_0" required="required" value="test" /></ugo-resumer></div>
+        <div id="item_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" /></ugo-resumer></div>
+        <div id="item_2" ugo-collection-item><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
+    </ugo-collection>
+</form>
+
+<script>
+    suite('<ugo-collection>', function() {
+        var el = document.getElementById('typical');
+
+        test('exists', function() {
+            assert.isNotNull(el);
+        });
+
+        test('List initialize', function () {
+            assert.equal(3, el.menuItems.length);
+        });
+
+        test('getTitle', function () {
+            assert.equal('test', el.getTitle(el.items[0], 0));
+        });
+
+        test('isValid', function() {
+            assert.equal(true, el.isValid(el.selected))
+        });
+
+        test('addItem', function () {
+            el.addItem();
+            assert.equal(4, el.menuItems.length);
+
+            assert.equal('test123', el.menuItems[el.menuItems.length-1].title);
+        });
+
+        test('isValid2', function() {
+            assert.equal(false, el.isValid(el.selected))
+        });
+
+        test('get items', function () {
+            assert.equal(4, el.items.length);
+        });
+
+        test('select right item', function() {
+            document.querySelector('#item_0').classList.contains(el.itemSelectedClass);
+        });
+
+
+        test('test reset selected and errorClass', function(done) {
+            //el.selected = 1;
+            setTimeout(function() {
+                el.selected = 1;
+                setTimeout(function() {
+                    assert.equal(3, el.selected);
+                    assert.isTrue(document.querySelector('#item_3').classList.contains(el.errorClass));
+                    done();
+                }, 100);
+            }, 100);
+        });
+
+        /**
+         * Trigger event polyfill
+         *
+         * @param {HTMLElement} element
+         * @param {String} eventName
+         * @private
+         */
+        var _triggerEvent = function(element, eventName) {
+            var event; // The custom event that will be created
+            if (document.createEvent) {
+                event = document.createEvent("HTMLEvents");
+                event.initEvent(eventName, true, true);
+            } else {
+                event = document.createEventObject();
+                event.eventType = eventName;
+            }
+
+            event.eventName = eventName;
+
+            if (document.createEvent) {
+                element.dispatchEvent(event);
+            } else {
+                element.fireEvent("on" + event.eventType, event);
+            }
+        };
+
+        test('events', function() {
+            el.items[el.selected].querySelector('[resumer-item]').value = 'abc123';
+            _triggerEvent(el.items[el.selected].querySelector('ugo-resumer'), 'change');
+            assert.equal('abc123', el.menuItems[el.selected].title);
+        });
+    });
+</script>
+
+</body>
+</html>

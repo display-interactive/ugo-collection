@@ -1,0 +1,25 @@
+{
+    "name": "ugo-collection",
+    "version": "0.0.1",
+    "authors": [
+        "Florian Roy"
+    ],
+    "description": "Polymer Element to handle special symfony collection",
+    "main": "element/*",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "keywords": ["Polymer", "web-components", "html", "form", "collection", "symfony"],
+    "dependencies": {
+        "polymer": "Polymer/polymer#^0.5",
+        "core-selector": "Polymer/core-selector",
+        "ugo-resumer": "git@github.com:display-interactive/ugo-resumer.git"
+    },
+    "devDependencies": {
+        "web-component-tester": "*"
+    }
+}

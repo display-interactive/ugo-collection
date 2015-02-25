@@ -1,0 +1,11 @@
+html /deep/ ugo-collection {
+    display: block;
+}
+
+.ugo-collection-list {
+    margin-bottom: 10px;
+}
+
+.ugo-collection-list .core-selected {
+    font-weight: bold;
+}

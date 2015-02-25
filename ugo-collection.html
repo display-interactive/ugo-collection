@@ -1,0 +1,241 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-selector/core-selector.html">
+<link rel="stylesheet" href="ugo-collection-ext.css">
+
+<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass successClass errorClass">
+    <template>
+        <link rel="stylesheet" href="ugo-collection.css">
+        <core-selector id="list" class="ugo-collection-list" selected="{{selected}}">
+            <template repeat="{{item, index in menuItems}}">
+                <div>{{item.title}} <button type="button" on-tap="{{removeItem}}" ugo-collection-index="{{index}}">{{removeText}}</button></div>
+            </template>
+        </core-selector>
+        <button id="add" disabled?="{{ disabledAdd }}" on-tap="{{addItem}}">{{addText}}</button>
+        <content id="items" select="{{itemSelector}}"></content>
+    </template>
+    <script>
+        Polymer('ugo-collection', {
+
+            /**
+             * selected index
+             *
+             * @type {Number}
+             */
+            selected: -1,
+
+            /**
+             * Text on add button
+             * @type {String}
+             */
+            addText: 'add',
+
+            /**
+             * Text on remove buttons
+             * @type {String}
+             */
+            removeText: 'remove',
+
+            /**
+             * Text on create
+             *
+             * @type {String}
+             */
+            createText: 'Editing...',
+
+            prototypeAttribute: 'data-prototype',
+            prototypeProperty: '__name__',
+            itemSelector: '[ugo-collection-item]',
+            itemAttribute: 'ugo-collection-item',
+            itemSelectedClass: 'ugo-collection-selected',
+
+            successClass: 'has-success',
+            errorClass: 'has-error',
+            disabledAdd: false,
+
+            /**
+             *
+             */
+            ready: function() {
+                this.index = this.items.length;
+                this.prev = null;
+            },
+
+            /**
+             * Dom ready to get sub element fonctionality
+             */
+            domReady: function() {
+                this.menuItems = [];
+                [].forEach.call(this.items, function(item, index) {
+                    this.menuItems.push({title: this.getTitle(item, index)});
+                }.bind(this));
+            },
+
+            /**
+             * Add item to the collection
+             */
+            addItem: function() {
+                //if active item is not valid: avoid addItem
+                if (!this.isValid(this.selected)) return;
+
+                var prototype = this.getAttribute(this.prototypeAttribute);
+
+                //get prototype markup, parse it
+                var re = new RegExp(this.prototypeProperty, 'g');
+                var item = this.createNodeFromString(prototype.replace(re, this.index));
+
+                //increment index
+                this.index += 1;
+
+                //add to html and add display it
+                this.appendChild(item);
+                this.menuItems.push({title: this.createText});
+                //select last
+                this.selected = this.items.length -1;
+                this.disabledAdd = true;
+            },
+
+            /**
+             * Remove item from the collection
+             */
+            removeItem: function(event) {
+                if (event.target) {
+                    var index = event.target.getAttribute('ugo-collection-index');
+                    if (!index) return;
+
+                    var item = this.items[index];
+                    item.parentNode.removeChild(item);
+
+                    //delete menu items
+                    delete this.menuItems[index];
+                    //rebase keys
+                    var newArr = [];
+                    this.menuItems.forEach(function (item) {
+                        newArr.push(item);
+                    });
+                    this.menuItems = newArr;
+
+                    this.selected = -1;
+                }
+            },
+
+            /**
+             * Returns an array of all items.
+             *
+             * @property items
+             */
+            get items() {
+                return this.$.items.getDistributedNodes();
+            },
+
+            /**
+             * on selected property changed
+             */
+            selectedChanged: function(oldValue, newValue) {
+                //console.log('oldValue:', oldValue, 'newValue:', newValue, 'prev:', this.prev, 'selected:', this.selected, 'valid:', this.isValid(oldValue));
+
+                if (-1 === oldValue || this.isValid(oldValue)) {
+                    for (var i = 0; i < this.items.length; i++) {
+                        //remove all error class
+
+                        if (i == this.selected) {
+                            this.items[i].classList.add(this.itemSelectedClass);
+                            this.addEventListeners(this.items[i]);
+                        } else {
+                            this.items[i].classList.remove(this.itemSelectedClass);
+                            this.removeEventListeners(this.items[i]);
+                        }
+                    }
+
+                    this.prev = null; //no more prevs
+                } else if (this.prev !== this.selected) {
+                    //we reset the selected value because the active item is invalid
+                    //the store the oldValue to avoid infinite loop
+                    //because this.selected = xxx trigger selectedChanged()
+                    this.items[oldValue].classList.add(this.errorClass);
+                    this.selected = oldValue;
+                    this.prev = oldValue;
+                }
+            },
+
+            /**
+             * Create a Node from a string
+             *
+             * @param {string} str
+             * @returns {Node}
+             * @private
+             */
+            createNodeFromString: function(str) {
+                var div = document.createElement('div');
+                div.innerHTML = str;
+
+                return div.firstChild;
+            },
+
+            /**
+             *  Check if the active item is valid
+             *
+             * @return {Boolean}
+             */
+            isValid: function(oldValue) {
+                var item = this.items[oldValue];
+                if (!item) return false;
+
+                var elements = item.querySelectorAll('input, textarea, select');
+
+                var isValid = true;
+                [].forEach.call(elements, function(element) {
+                    if (!element.validity.valid) {
+                        isValid = false;
+                    }
+                });
+
+                return isValid;
+            },
+
+            /**
+             * Get resume for ugo-resumer if exists or get Index
+             *
+             * @return {String}
+             */
+            getTitle: function(item, index) {
+                var resumer = item.querySelector('ugo-resumer');
+                if (resumer && resumer.resume != undefined && resumer.resume) {
+                    return resumer.resume;
+                } else {
+                    return index;
+                }
+            },
+
+            /**
+             * Add listeners
+             */
+            addEventListeners: function(item) {
+                var resumer = item.querySelector('ugo-resumer');
+                if (resumer) {
+                    var that = this;
+                    resumer.addEventListener('ugo-resumer-change', function() {
+                        that.menuItems[that.selected].title = that.getTitle(this.parentNode, that.selected);
+
+                        if (that.isValid(that.selected)) {
+                            that.disabledAdd = false;
+                            this.parentNode.classList.remove(that.errorClass);
+                        } else {
+                            that.disabledAdd = true;
+                            this.parentNode.classList.add(that.errorClass);
+                        }
+                    });
+                }
+            },
+
+            /**
+             * Remove listeners
+             */
+            removeEventListeners: function(item) {
+                var resumer = item.querySelector('ugo-resumer');
+                if (resumer) {
+                    resumer.removeEventListener('ugo-resumer-change');
+                }
+            }
+        });
+    </script>
+</polymer-element>
