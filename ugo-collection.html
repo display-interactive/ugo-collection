@@ -57,12 +57,7 @@
             ready: function() {
                 this.index = this.items.length;
                 this.prev = null;
-            },
 
-            /**
-             * Dom ready to get sub element fonctionality
-             */
-            domReady: function() {
                 this.menuItems = [];
                 [].forEach.call(this.items, function(item, index) {
                     this.menuItems.push({title: this.getTitle(item, index)});
