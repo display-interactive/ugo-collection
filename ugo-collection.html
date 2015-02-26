@@ -113,25 +113,25 @@
              * Remove item from the collection
              */
             removeItem: function(event) {
-                if (event.target) {
-                    var index = event.target.getAttribute('ugo-collection-index');
-                    if (!index) return;
+                var index = event.target.getAttribute('ugo-collection-index');
+                if (!index) return;
 
-                    var item = this.items[index];
-                    item.parentNode.removeChild(item);
+                var item = this.items[index];
+                item.parentNode.removeChild(item);
 
-                    //delete menu items
-                    delete this.menuItems[index];
-                    //rebase keys
-                    var newArr = [];
-                    this.menuItems.forEach(function (item) {
-                        newArr.push(item);
-                    });
-                    this.menuItems = newArr;
+                //delete menu items
+                delete this.menuItems[index];
+                //rebase keys
+                var newArr = [];
+                this.menuItems.forEach(function (item) {
+                    newArr.push(item);
+                });
+                this.menuItems = newArr;
 
-                    //set selected to -1 if the deleted item is selected
-                    if (this.selected === index) this.selected = -1;
-                }
+                //set selected to -1 if the deleted item is selected
+                if (this.selected === parseInt(index)) this.selected = -1;
+
+                event.stopPropagation();
             },
 
             /**
@@ -148,9 +148,7 @@
              * @private
              */
             selectedChanged: function(oldValue, newValue) {
-                //console.log('oldValue:', oldValue, 'newValue:', newValue, 'prev:', this.prev, 'selected:', this.selected, 'valid:', this.isValid(oldValue));
-
-                if (undefined == this.items[oldValue] || this.isValid(oldValue)) {
+                if (-1 == oldValue || this.isValid(oldValue)) {
                     for (var i = 0; i < this.items.length; i++) {
                         //remove all error class
 
@@ -164,7 +162,7 @@
                     }
 
                     this.prev = null; //no more prevs
-                } else if (this.prev !== this.selected) {
+                } else if (this.prev !== this.selected && undefined != this.items[oldValue]) {
                     //we reset the selected value because the active item is invalid
                     //the store the oldValue to avoid infinite loop
                     //because this.selected = xxx trigger selectedChanged()

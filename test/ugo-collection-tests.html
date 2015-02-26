@@ -107,6 +107,21 @@
             _triggerEvent(el.items[el.selected].querySelector('ugo-resumer'), 'change');
             assert.equal('abc123', el.menuItems[el.selected].title);
         });
+
+
+        test('removeItem', function() {
+            var index = el.selected;
+            _triggerEvent(el.shadowRoot.querySelector('[ugo-collection-index="'+index+'"]'), 'tap');
+            assert.equal(undefined, el.items[index]);
+            assert.equal(undefined, document.querySelector('#item_3'));
+            assert.equal(-1, el.selected);
+
+            el.selected = 2;
+            _triggerEvent(el.shadowRoot.querySelector('[ugo-collection-index="0"]'), 'tap');
+            assert.equal(2, el.items.length);
+            assert.equal(undefined, document.querySelector('#item_0'));
+            assert.equal(2, el.selected);
+        });
     });
 </script>
 
