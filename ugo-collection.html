@@ -251,14 +251,17 @@
              * @param event
              */
             onResumerChangeHandler: function(event) {
-                this.menuItems[this.selected].title = this.getTitle(event.target.parentNode, this.selected);
+                var menuItem = this.menuItems[this.selected];
+                if (undefined != menuItem) {
+                    menuItem.title = this.getTitle(event.target.parentNode, this.selected);
 
-                if (this.isValid(this.selected)) {
-                    this.disabledAdd = false;
-                    this.parentNode.classList.remove(this.errorClass);
-                } else {
-                    this.disabledAdd = true;
-                    this.parentNode.classList.add(this.errorClass);
+                    if (this.isValid(this.selected)) {
+                        this.disabledAdd = false;
+                        this.parentNode.classList.remove(this.errorClass);
+                    } else {
+                        this.disabledAdd = true;
+                        this.parentNode.classList.add(this.errorClass);
+                    }
                 }
             },
 
