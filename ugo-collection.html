@@ -57,12 +57,28 @@
             disabledAdd: false,
 
             /**
+             * Array containing menus items
+             * @return {Array}
+             */
+            menuItems: [],
+
+            /**
              *
              */
             ready: function() {
                 this.index = this.items.length;
                 this.prev = null;
+                this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
 
+                /*[].forEach.call(this.items, function(item, index) {
+                    this.menuItems.push({title: this.getTitle(item, index)});
+                }.bind(this));*/
+            },
+
+            /**
+             * Rebuild menu on dom ready
+             */
+            domReady: function() {
                 this.menuItems = [];
                 [].forEach.call(this.items, function(item, index) {
                     this.menuItems.push({title: this.getTitle(item, index)});
@@ -128,6 +144,7 @@
 
             /**
              * on selected property changed
+             * @private
              */
             selectedChanged: function(oldValue, newValue) {
                 //console.log('oldValue:', oldValue, 'newValue:', newValue, 'prev:', this.prev, 'selected:', this.selected, 'valid:', this.isValid(oldValue));
@@ -171,9 +188,10 @@
             },
 
             /**
-             *  Check if the active item is valid
+             * Check if the active item is valid
              *
              * @return {Boolean}
+             * @private
              */
             isValid: function(oldValue) {
                 var item = this.items[oldValue];
@@ -195,6 +213,7 @@
              * Get resume for ugo-resumer if exists or get Index
              *
              * @return {String}
+             * @private
              */
             getTitle: function(item, index) {
                 var resumer = item.querySelector('ugo-resumer');
@@ -207,34 +226,43 @@
 
             /**
              * Add listeners
+             * @private
              */
             addEventListeners: function(item) {
                 var resumer = item.querySelector('ugo-resumer');
                 if (resumer) {
-                    var that = this;
-                    resumer.addEventListener('ugo-resumer-change', function() {
-                        that.menuItems[that.selected].title = that.getTitle(this.parentNode, that.selected);
-
-                        if (that.isValid(that.selected)) {
-                            that.disabledAdd = false;
-                            this.parentNode.classList.remove(that.errorClass);
-                        } else {
-                            that.disabledAdd = true;
-                            this.parentNode.classList.add(that.errorClass);
-                        }
-                    });
+                    Polymer.addEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
                 }
             },
 
             /**
              * Remove listeners
+             * @private
              */
             removeEventListeners: function(item) {
                 var resumer = item.querySelector('ugo-resumer');
                 if (resumer) {
-                    resumer.removeEventListener('ugo-resumer-change');
+                    Polymer.removeEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
                 }
-            }
+            },
+
+            /**
+             * ugo-resumer-change to update list
+             * @param event
+             */
+            onResumerChangeHandler: function(event) {
+                this.menuItems[this.selected].title = this.getTitle(event.target.parentNode, this.selected);
+
+                if (this.isValid(this.selected)) {
+                    this.disabledAdd = false;
+                    this.parentNode.classList.remove(this.errorClass);
+                } else {
+                    this.disabledAdd = true;
+                    this.parentNode.classList.add(this.errorClass);
+                }
+            },
+
+
         });
     </script>
 </polymer-element>
