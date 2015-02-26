@@ -18,10 +18,20 @@ ugo-collection {
     padding: 0;
 }
 
+:host(.ugo-theme):before,
+:host(.ugo-theme):after {
+    display: table;
+    content: " ";
+}
+
+:host(.ugo-theme):after  {
+    clear:both;
+}
+
 :host(.ugo-theme) > .ugo-collection-menu {
     display: block;
     float: left;
-    width: 20%;
+    width: 24%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -157,7 +167,7 @@ ugo-collection {
 :host(.ugo-theme) ::content [ugo-collection-item] {
     position: absolute;
     float: right;
-    width: 70%;
+    width: 74%;
     visibility: hidden;
     background-color: #D7E1EB;
     padding: 30px;
