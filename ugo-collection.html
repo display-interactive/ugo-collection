@@ -129,7 +129,8 @@
                     });
                     this.menuItems = newArr;
 
-                    this.selected = -1;
+                    //set selected to -1 if the deleted item is selected
+                    if (this.selected === index) this.selected = -1;
                 }
             },
 
