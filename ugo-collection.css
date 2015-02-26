@@ -31,11 +31,11 @@ ugo-collection {
 :host(.ugo-theme) > .ugo-collection-menu {
     display: block;
     float: left;
-    width: 24%;
+    width: 30%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding-right: 20px;
+    padding-right: 35px;
 }
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector {
@@ -167,13 +167,17 @@ ugo-collection {
 :host(.ugo-theme) ::content [ugo-collection-item] {
     position: absolute;
     float: right;
-    width: 74%;
+    width: 70%;
     visibility: hidden;
     background-color: #D7E1EB;
     padding: 30px;
     margin: 0;
     border: 0;
     border-radius: 4px;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 :host(.ugo-theme) ::content [ugo-collection-item].ugo-collection-selected {
