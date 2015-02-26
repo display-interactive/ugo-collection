@@ -7,13 +7,15 @@
         <div class="ugo-collection-menu">
             <core-selector id="list" class="ugo-collection-list" selected="{{selected}}">
                 <template repeat="{{item, index in menuItems}}">
-                    <div>{{item.title}} <button type="button" on-tap="{{removeItem}}" ugo-collection-index="{{index}}">{{removeText}}</button></div>
+                    <div>
+                        {{item.title}}
+                        <button type="button" on-tap="{{removeItem}}" ugo-collection-index="{{index}}">{{removeText}}</button>
+                    </div>
                 </template>
             </core-selector>
             <button id="add" disabled?="{{ disabledAdd }}" on-tap="{{addItem}}">{{addText}}</button>
         </div>
         <content id="items" select="{{itemSelector}}"></content>
-
     </template>
     <script>
         Polymer('ugo-collection', {
