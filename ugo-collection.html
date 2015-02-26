@@ -3,7 +3,7 @@
 
 <polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass successClass errorClass">
     <template>
-        <link rel="stylesheet" href="ugo-collection.css">
+        <link rel="stylesheet" href="ugo-collection.css" shim-shadowdom>
         <div class="ugo-collection-menu">
             <core-selector id="list" class="ugo-collection-list" selected="{{selected}}">
                 <template repeat="{{item, index in menuItems}}">
