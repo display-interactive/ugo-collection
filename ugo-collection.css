@@ -157,6 +157,7 @@ ugo-collection {
     -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
     font-size: 0;
+    color: #00468C;
 }
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div > button:before {
