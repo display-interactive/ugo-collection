@@ -9,8 +9,8 @@
                 <div>{{item.title}} <button type="button" on-tap="{{removeItem}}" ugo-collection-index="{{index}}">{{removeText}}</button></div>
             </template>
         </core-selector>
-        <button id="add" disabled?="{{ disabledAdd }}" on-tap="{{addItem}}">{{addText}}</button>
         <content id="items" select="{{itemSelector}}"></content>
+        <button id="add" disabled?="{{ disabledAdd }}" on-tap="{{addItem}}">{{addText}}</button>
     </template>
     <script>
         Polymer('ugo-collection', {
