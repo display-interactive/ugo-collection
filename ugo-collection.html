@@ -149,7 +149,7 @@
             selectedChanged: function(oldValue, newValue) {
                 //console.log('oldValue:', oldValue, 'newValue:', newValue, 'prev:', this.prev, 'selected:', this.selected, 'valid:', this.isValid(oldValue));
 
-                if (-1 === oldValue || this.isValid(oldValue)) {
+                if (undefined == this.items[oldValue] || this.isValid(oldValue)) {
                     for (var i = 0; i < this.items.length; i++) {
                         //remove all error class
 
