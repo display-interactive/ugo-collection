@@ -90,7 +90,7 @@
              */
             addItem: function() {
                 //if active item is not valid: avoid addItem
-                if (!this.isValid(this.selected)) return;
+                if (this.items[this.selected] != undefined && !this.isValid(this.selected)) return;
 
                 var prototype = this.getAttribute(this.prototypeAttribute);
 
