@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-selector/core-selector.html">
 
-<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass successClass errorClass">
+<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass successClass errorClass events">
     <template>
         <link rel="stylesheet" href="ugo-collection.css" shim-shadowdom>
         <div class="ugo-collection-menu">
@@ -56,6 +56,7 @@
             successClass: 'has-success',
             errorClass: 'has-error',
             disabledAdd: false,
+            events: 'change keyup',
 
             /**
              * Array containing menus items
@@ -69,7 +70,7 @@
             ready: function() {
                 this.index = this.items.length;
                 this.prev = null;
-                this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
+                this.changeListener = this.onChangeHandler.bind(this);
             },
 
             /**
@@ -243,10 +244,9 @@
              * @private
              */
             addListeners: function(item) {
-                var resumer = item.querySelector('ugo-resumer');
-                if (resumer) {
-                    Polymer.addEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
-                }
+                this.getEvents().forEach(function(event) {
+                    Polymer.addEventListener(item, event, this.changeListener);
+                }.bind(this));
             },
 
             /**
@@ -254,17 +254,24 @@
              * @private
              */
             removeListeners: function(item) {
-                var resumer = item.querySelector('ugo-resumer');
-                if (resumer) {
-                    Polymer.removeEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
-                }
+                this.getEvents().forEach(function(event) {
+                    Polymer.removeEventListener(item, event, this.changeListener);
+                }.bind(this));
+            },
+
+            /**
+             * @return []
+             * @private
+             */
+            getEvents: function() {
+                return this.events.split(' ');
             },
 
             /**
              * ugo-resumer-change to update list
              * @param event
              */
-            onResumerChangeHandler: function(event) {
+            onChangeHandler: function(event) {
                 var menuItem = this.menuItems[this.selected];
                 if (undefined != menuItem) {
                     menuItem.title = this.getTitle(event.target.parentNode, this.selected);
