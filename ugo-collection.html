@@ -278,11 +278,11 @@
 
                     if (this.isValid(this.selected)) {
                         this.disabledAdd = false;
-                        this.parentNode.classList.remove(this.errorClass);
+                        event.target.parentNode.classList.remove(this.errorClass);
                         menuItem.hasError = false;
                     } else {
                         this.disabledAdd = true;
-                        this.parentNode.classList.add(this.errorClass);
+                        event.target.parentNode.classList.add(this.errorClass);
                         menuItem.hasError = true;
                     }
                 }
