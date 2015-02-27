@@ -76,6 +76,10 @@ ugo-collection {
     box-sizing: border-box;
 }
 
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error] {
+    color: #a94442;
+}
+
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type {
     border-radius: 4px 4px 0 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
@@ -90,8 +94,35 @@ ugo-collection {
 }
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div.core-selected {
+    position: relative;
     background-color: #D7E1EB;
     font-weight: normal;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div .ugo-collection-arrow {
+    display: none;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div.core-selected .ugo-collection-arrow {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: -16px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 17px 0 17px 15px;
+    border-color: transparent transparent transparent #D7E1EB;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type .ugo-collection-arrow {
+    top: 1px;
+    border-width: 16px 0 16px 15px;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-of-type .ugo-collection-arrow {
+    top: 1px;
+    border-width: 16px 0 16px 15px;
 }
 
 /*button add*/
