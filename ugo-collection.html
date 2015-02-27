@@ -63,16 +63,12 @@
             menuItems: [],
 
             /**
-             *
+             * init
              */
             ready: function() {
                 this.index = this.items.length;
                 this.prev = null;
                 this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
-
-                /*[].forEach.call(this.items, function(item, index) {
-                    this.menuItems.push({title: this.getTitle(item, index)});
-                }.bind(this));*/
             },
 
             /**
@@ -156,10 +152,10 @@
                         if (i == this.selected) {
                             selectedFound = true;
                             this.items[i].classList.add(this.itemSelectedClass);
-                            this.addEventListeners(this.items[i]);
+                            this.addListeners(this.items[i]);
                         } else {
                             this.items[i].classList.remove(this.itemSelectedClass);
-                            this.removeEventListeners(this.items[i]);
+                            this.removeListeners(this.items[i]);
                         }
                     }
 
@@ -179,6 +175,9 @@
                 }
             },
 
+            /**
+             * Menu display or not with menuItems changes
+             */
             menuItemsChanged: function() {
                 this.$.list.style.display = this.menuItems.length > 0 ? 'block' : 'none';
             },
@@ -223,7 +222,6 @@
              * Get resume for ugo-resumer if exists or get Index
              *
              * @return {String}
-             * @private
              */
             getTitle: function(item, index) {
                 var resumer = item.querySelector('ugo-resumer');
@@ -238,7 +236,7 @@
              * Add listeners
              * @private
              */
-            addEventListeners: function(item) {
+            addListeners: function(item) {
                 var resumer = item.querySelector('ugo-resumer');
                 if (resumer) {
                     Polymer.addEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
@@ -249,7 +247,7 @@
              * Remove listeners
              * @private
              */
-            removeEventListeners: function(item) {
+            removeListeners: function(item) {
                 var resumer = item.querySelector('ugo-resumer');
                 if (resumer) {
                     Polymer.removeEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
