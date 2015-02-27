@@ -76,12 +76,12 @@ ugo-collection {
     box-sizing: border-box;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-child {
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type {
     border-radius: 4px 4px 0 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-child {
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-of-child {
     border-radius: 0 0 4px 4px;
 }
 
