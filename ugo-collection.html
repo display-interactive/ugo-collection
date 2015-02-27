@@ -172,6 +172,10 @@
                 }
             },
 
+            menuItemsChanged: function() {
+                this.$.list.style.display = this.menuItems.length > 0 ? 'block' : 'none';
+            },
+
             /**
              * Create a Node from a string
              *

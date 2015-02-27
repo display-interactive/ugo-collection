@@ -22,6 +22,10 @@
         <div id="item_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" /></ugo-resumer></div>
         <div id="item_2" ugo-collection-item><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
     </ugo-collection>
+
+    <br/>
+    <ugo-collection class="ugo-theme" id="empty" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+    </ugo-collection>
 </form>
 
 <script>
@@ -121,6 +125,14 @@
             assert.equal(2, el.items.length);
             assert.equal(undefined, document.querySelector('#item_0'));
             assert.equal(2, el.selected);
+        });
+
+        var empty = document.querySelector('#empty');
+        test('add empty', function() {
+            empty.addItem();
+            assert.equal(1, empty.menuItems.length);
+
+            assert.equal('Editing...', empty.menuItems[empty.menuItems.length-1].title);
         });
     });
 </script>
