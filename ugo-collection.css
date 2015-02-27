@@ -150,7 +150,7 @@ ugo-collection {
     top: 8px;
     right: 7px;
     border: 0;
-    background: none;
+    background-color: transparent;
 
     display: inline-block;
     font-family: 'Glyphicons Halflings';
@@ -167,6 +167,7 @@ ugo-collection {
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div > button:before {
     content: "\e014";
     font-size: 1.4rem;
+    background: none;
 }
 
 :host(.ugo-theme) ::content [ugo-collection-item] {
