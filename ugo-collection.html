@@ -149,16 +149,23 @@
              */
             selectedChanged: function(oldValue, newValue) {
                 if (-1 == oldValue || this.isValid(oldValue)) {
+                    var selectedFound = false;
                     for (var i = 0; i < this.items.length; i++) {
                         //remove all error class
 
                         if (i == this.selected) {
+                            selectedFound = true;
                             this.items[i].classList.add(this.itemSelectedClass);
                             this.addEventListeners(this.items[i]);
                         } else {
                             this.items[i].classList.remove(this.itemSelectedClass);
                             this.removeEventListeners(this.items[i]);
                         }
+                    }
+
+                    //if we didn't selected an item we set selected to -1
+                    if (!selectedFound) {
+                        this.selected = -1;
                     }
 
                     this.prev = null; //no more prevs

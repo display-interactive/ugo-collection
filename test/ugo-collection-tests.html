@@ -24,7 +24,7 @@
     </ugo-collection>
 
     <br/>
-    <ugo-collection class="ugo-theme" id="empty" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+    <ugo-collection class="ugo-theme" id="empty" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
     </ugo-collection>
 </form>
 
@@ -80,13 +80,6 @@
             }, 100);
         });
 
-        /**
-         * Trigger event polyfill
-         *
-         * @param {HTMLElement} element
-         * @param {String} eventName
-         * @private
-         */
         var _triggerEvent = function(element, eventName) {
             var event; // The custom event that will be created
             if (document.createEvent) {
@@ -128,11 +121,15 @@
         });
 
         var empty = document.querySelector('#empty');
-        test('add empty', function() {
+        test('add empty', function(done) {
             empty.addItem();
             assert.equal(1, empty.menuItems.length);
-
             assert.equal('Editing...', empty.menuItems[empty.menuItems.length-1].title);
+            //it's not instantaneous
+            setTimeout(function() {
+                assert.isTrue(empty.items[0].classList.contains(empty.itemSelectedClass));
+                done();
+            }, 100)
         });
     });
 </script>
