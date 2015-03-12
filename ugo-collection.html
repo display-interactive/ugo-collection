@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-selector/core-selector.html">
 
-<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass successClass errorClass">
+<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass">
     <template>
         <link rel="stylesheet" href="ugo-collection.css" shim-shadowdom>
         <div class="ugo-collection-menu">
@@ -53,8 +53,15 @@
             itemAttribute: 'ugo-collection-item',
             itemSelectedClass: 'ugo-collection-selected',
 
-            successClass: 'has-success',
+            /**
+             * class used to ma
+             */
             errorClass: 'has-error',
+
+            /**
+             * Property use to disable the add button
+             * @type {Boolean}
+             */
             disabledAdd: false,
 
             /**
@@ -76,9 +83,15 @@
              * Rebuild menu on dom ready
              */
             domReady: function() {
+                var selectedChanged = false;
                 this.menuItems = [];
                 [].forEach.call(this.items, function(item, index) {
-                    this.menuItems.push({title: this.getTitle(item, index), hasError: false});
+                    var hasError = this.hasErrorClass(index);
+                    this.menuItems.push({title: this.getTitle(item, index), hasError: hasError});
+                    if (hasError && !selectedChanged) {
+                        this.selected = index;
+                        selectedChanged = true;
+                    }
                 }.bind(this));
             },
 
@@ -223,6 +236,19 @@
 
                 return isValid;
             },
+
+            /**
+             * Check if given item has error class so that it's marked as errored externaly
+             *
+             * @private
+             */
+            hasErrorClass: function(value) {
+                var item = this.items[value];
+                if (!item) return false;
+
+                return item.classList.contains('has-error');
+            },
+
 
             /**
              * Get resume for ugo-resumer if exists or get Index

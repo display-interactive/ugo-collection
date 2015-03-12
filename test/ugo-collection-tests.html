@@ -26,6 +26,12 @@
     <br/>
     <ugo-collection class="ugo-theme" id="empty" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
     </ugo-collection>
+
+    <ugo-collection id="has-error-test" createText="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+        <div id="item_t_0" ugo-collection-item><ugo-resumer><h2>Item 0</h2><input type="text" resumer-item id="text_0" required="required" value="test" /></ugo-resumer></div>
+        <div id="item_t_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" /></ugo-resumer></div>
+        <div id="item_t_2" ugo-collection-item class="has-error"><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
+    </ugo-collection>
 </form>
 
 <script>
@@ -58,6 +64,8 @@
         test('isValid2', function() {
             assert.equal(false, el.isValid(el.selected))
         });
+
+
 
         test('get items', function () {
             assert.equal(4, el.items.length);
@@ -130,6 +138,12 @@
                 assert.isTrue(empty.items[0].classList.contains(empty.itemSelectedClass));
                 done();
             }, 100)
+        });
+
+        var elHasError = document.getElementById('has-error-test');
+        test('hasErrorClass', function() {
+            assert.isTrue(elHasError.menuItems[2].hasError);
+            assert.equal(2, elHasError.selected);
         });
     });
 </script>

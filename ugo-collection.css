@@ -76,13 +76,24 @@ ugo-collection {
     box-sizing: border-box;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error] {
-    color: #a94442;
-}
-
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type {
     border-radius: 4px 4px 0 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error] {
+    color: #a94442;
+    background-color: #ffebeb;
+
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error]:nth-child(odd) {
+    background-color: #f2dede;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error].core-selected {
+    background-color: #a94442;
+    color: #fff;
 }
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-of-child {
@@ -92,6 +103,8 @@ ugo-collection {
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div:nth-child(odd) {
     background-color: #f9f9f9;
 }
+
+
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div.core-selected {
     position: relative;
@@ -113,6 +126,10 @@ ugo-collection {
     border-style: solid;
     border-width: 17px 0 17px 15px;
     border-color: transparent transparent transparent #D7E1EB;
+}
+
+:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error].core-selected .ugo-collection-arrow {
+    border-color: transparent transparent transparent #a94442;
 }
 
 :host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type .ugo-collection-arrow {
