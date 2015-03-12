@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-selector/core-selector.html">
 
-<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass">
+<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass nestedErrorSelector">
     <template>
         <link rel="stylesheet" href="ugo-collection.css" shim-shadowdom>
         <div class="ugo-collection-menu">
@@ -57,6 +57,7 @@
              * class used to ma
              */
             errorClass: 'has-error',
+            nestedErrorSelector: '.has-error',
 
             /**
              * Property use to disable the add button
@@ -246,7 +247,10 @@
                 var item = this.items[value];
                 if (!item) return false;
 
-                return item.classList.contains('has-error');
+                if (item.classList.contains('has-error') || item.querySelectorAll(this.nestedErrorSelector).length > 0)
+                    return true;
+
+                return false;
             },
 
 
