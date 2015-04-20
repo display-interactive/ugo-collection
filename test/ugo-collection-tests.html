@@ -17,17 +17,19 @@
 <body>
 
 <form id="form">
-    <ugo-collection id="typical" createText="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+    <ugo-collection id="typical" create-text="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
         <div id="item_0" ugo-collection-item><ugo-resumer><h2>Item 0</h2><input type="text" resumer-item id="text_0" required="required" value="test" /></ugo-resumer></div>
         <div id="item_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" /></ugo-resumer></div>
         <div id="item_2" ugo-collection-item><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
     </ugo-collection>
 
     <br/>
+    <hr>
     <ugo-collection class="ugo-theme" id="empty" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
     </ugo-collection>
+    <hr>
 
-    <ugo-collection id="has-error-test" createText="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
+    <ugo-collection id="has-error-test" create-text="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
         <div id="item_t_0" ugo-collection-item><ugo-resumer><h2>Item 0</h2><input type="text" resumer-item id="text_0" required="required" value="test" /></ugo-resumer></div>
         <div id="item_t_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><div class="has-error"><input type="text" resumer-item id="text_1" required="required" /></div></ugo-resumer></div>
         <div id="item_t_2" ugo-collection-item class="has-error"><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
@@ -42,8 +44,11 @@
             assert.isNotNull(el);
         });
 
-        test('List initialize', function () {
-            assert.equal(3, el.menuItems.length);
+        test('List initialize', function (done) {
+            setTimeout(function() {
+                assert.equal(3, el.menuItems.length);
+                done();
+            }, 500);
         });
 
         test('getTitle', function () {
@@ -54,18 +59,18 @@
             assert.equal(true, el.isValid(el.selected))
         });
 
-        test('addItem', function () {
+        test('addItem', function (done) {
             el.addItem();
-            assert.equal(4, el.menuItems.length);
-
-            assert.equal('test123', el.menuItems[el.menuItems.length-1].title);
+            setTimeout(function() {
+                assert.equal(4, el.menuItems.length);
+                assert.equal('test123', el.menuItems[el.menuItems.length - 1].title);
+                done();
+            }, 500);
         });
 
         test('isValid2', function() {
             assert.equal(false, el.isValid(el.selected))
         });
-
-
 
         test('get items', function () {
             assert.equal(4, el.items.length);
@@ -74,7 +79,6 @@
         test('select right item', function() {
             document.querySelector('#item_0').classList.contains(el.itemSelectedClass);
         });
-
 
         test('test reset selected and errorClass', function(done) {
             //el.selected = 1;
@@ -107,38 +111,55 @@
             }
         };
 
-        test('events', function() {
+        test('events', function(done) {
             el.items[el.selected].querySelector('[resumer-item]').value = 'abc123';
             _triggerEvent(el.items[el.selected].querySelector('ugo-resumer'), 'change');
-            assert.equal('abc123', el.menuItems[el.selected].title);
+            setTimeout(function() {
+                assert.equal('abc123', el.menuItems[el.selected].title);
+                done();
+            }, 300);
         });
 
 
         test('removeItem', function() {
-            var index = el.selected;
-            _triggerEvent(el.shadowRoot.querySelector('[ugo-collection-index="'+index+'"]'), 'tap');
-            assert.equal(undefined, el.items[index]);
+            var oldLen = el.items.length,
+                index = el.selected;
+
+            el.removeItem({
+                stopPropagation: function() {},
+                target: Polymer.dom(el.root).querySelector('[data-id="'+index+'"]')
+            });
+
+            assert.equal(oldLen-1, el.items.length);
             assert.equal(undefined, document.querySelector('#item_3'));
             assert.equal(-1, el.selected);
 
             el.selected = 2;
-            _triggerEvent(el.shadowRoot.querySelector('[ugo-collection-index="0"]'), 'tap');
+            el.removeItem({
+                stopPropagation: function() {},
+                target: Polymer.dom(el.root).querySelector('[data-id="0"]')
+            });
             assert.equal(2, el.items.length);
             assert.equal(undefined, document.querySelector('#item_0'));
             assert.equal(2, el.selected);
         });
 
+
         var empty = document.querySelector('#empty');
         test('add empty', function(done) {
             empty.addItem();
-            assert.equal(1, empty.menuItems.length);
-            assert.equal('Editing...', empty.menuItems[empty.menuItems.length-1].title);
-            //it's not instantaneous
             setTimeout(function() {
-                assert.isTrue(empty.items[0].classList.contains(empty.itemSelectedClass));
-                done();
-            }, 100)
+                assert.equal(1, empty.menuItems.length);
+                var id = empty.menuItems.length-1;
+                assert.equal('Editing...', empty.menuItems[id].title);
+                //it's not instantaneous
+                setTimeout(function() {
+                    assert.isTrue(empty.items[id].classList.contains(empty.itemSelectedClass));
+                    done();
+                }, 100);
+            }, 500);
         });
+
 
         var elHasError = document.getElementById('has-error-test');
         test('hasErrorClass', function() {

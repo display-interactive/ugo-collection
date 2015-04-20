@@ -2,7 +2,7 @@
 <link rel="import" href="../core-selector/core-selector.html">
 
 <dom-module id="ugo-collection">
-    <link rel="stylesheet" href="ugo-collection.css">
+    <link rel="import" type="css" href="ugo-collection.css">
     <template>
         <div class="ugo-collection-menu">
             <core-selector id="list" class="ugo-collection-list" selected="{{selected}}" on-tap="removeItem">
@@ -131,6 +131,11 @@
         },
 
         /**
+         * Used to block infinite loop in selectedChanged method
+         */
+        prev: null,
+
+        /**
          * job interval
          */
         interval: 500,
@@ -156,6 +161,7 @@
             this.prev = null;
             this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
             window.addEventListener('DOMContentLoaded', this.domReady.bind(this));
+
         },
 
         /**
@@ -194,9 +200,10 @@
 
             //add to html and add display it
             Polymer.dom(this).appendChild(item);
+            Polymer.dom.flush();
             item.classList.add(this.errorClass);
-            var menuItems = this.menuItems.slice();
-            menuItems.push({id: this.menuItems.length, title: this.createText, hasError: true, removeText: this.removeText});
+            var menuItems = this._cloneMenuItems();
+            menuItems.push({id: menuItems.length, title: this.createText, hasError: true, removeText: this.removeText});
             this._setItems(menuItems);
             //select last
             this.selected = this.items.length -1;
@@ -212,16 +219,16 @@
 
             var item = this.items[id];
             Polymer.dom(item.parentNode).removeChild(item);
-            item.classList.remove(this.errorClass);
+            Polymer.dom.flush();
 
             //delete menu items
-            var menuItems = this.menuItems.slice();
+            var menuItems = this._cloneMenuItems();
             delete menuItems[id];
             //rebase keys
             var newArr = [];
-            menuItems.forEach(function (item) {
-                item.id = newArr.length;
-                newArr.push(item);
+            menuItems.forEach(function (el) {
+                el.id = newArr.length;
+                newArr.push(el);
             });
             this._setItems(newArr);
 
@@ -246,8 +253,8 @@
         /**
          * on selected property changed
          */
-        selectedChanged: function(oldValue, newValue) {
-            if (-1 == oldValue || this.isValid(oldValue)) {
+        selectedChanged: function(newValue, oldValue) {
+            if (-1 == oldValue || undefined == oldValue || this.isValid(oldValue)) {
                 var selectedFound = false;
                 for (var i = 0; i < this.items.length; i++) {
                     //remove all error class
@@ -273,8 +280,8 @@
                 //the store the oldValue to avoid infinite loop
                 //because this.selected = xxx trigger selectedChanged()
                 this.items[oldValue].classList.add(this.errorClass);
+                this.prev = oldValue; //be carefull this.prev assignation must be before this.selected assignation to avoid infinite loop
                 this.selected = oldValue;
-                this.prev = oldValue;
             }
         },
 
@@ -282,7 +289,7 @@
          * Menu display or not with menuItems changes
          */
         menuItemsChanged: function() {
-            this.$.list.style.display = this.menuItems.length > 0 ? 'block' : 'none';
+            this.$.list.style.display = this.menuItems && this.menuItems.length > 0 ? 'block' : 'none';
         },
 
         /**
@@ -291,7 +298,7 @@
         removeTextChanged: function() {
             if (!this.menuItems || 0 === this.menuItems.length) return;
 
-            var menuItems = this.menuItems.slice();
+            var menuItems = this._cloneMenuItems();
             for (var i = 0; i < menuItems.length; i++) {
                 menuItems[i].removeText = this.removeText;
             }
@@ -390,7 +397,7 @@
          * @param event
          */
         onResumerChangeHandler: function(event) {
-            var menuItems = this.menuItems.slice(),
+            var menuItems = this._cloneMenuItems(),
                 menuItem = menuItems[this.selected];
 
             if (undefined != menuItem) {
@@ -428,6 +435,13 @@
                     method();
                 }, Date.now() - this.jobs[name]);
             }
+        },
+
+        /**
+         * Clone menuItems
+         */
+        _cloneMenuItems: function() {
+            return this.menuItems ? this.menuItems.slice() : [];
         },
 
         /**
