@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <meta charset="utf-8">
+    <title>Ugo collection demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../../ugo-resumer/ugo-resumer.html">
+    <link rel="import" href="../ugo-collection.html">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            padding: 100px 20px 0;
+            text-align: center;
+        }
+
+        div[ugo-collection-item] {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-top: 10px;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        div[ugo-collection-item].ugo-collection-selected {
+            position: inherit;
+            visibility: visible;
+        }
+
+        div[ugo-collection-item].has-error input:invalid {
+            border-color: red;
+        }
+    </style>
+</head>
+
+<body unresolved>
+
+<div id="container">
+    <h1><code>Ugo collection with polymer</code> in action:</h1>
+
+    <ugo-collection
+            class="ugo-theme"
+            id="plop"
+            selected="0"
+            data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; required=&quot;required&quot; resumer-item value=&quot;&quot; /><br/><br/><input type=&quot;text&quot; /></ugo-resumer></div>">
+        <div id="item_0" ugo-collection-item>
+            <ugo-resumer><h2>Item 0</h2><input type="text" id="text_0" required="required" resumer-item value="item 0"/><br/><br/><input type="text" /></ugo-resumer>
+        </div>
+        <div id="item_1" ugo-collection-item class="has-error">
+            <ugo-resumer><h2>Item 1</h2><input type="text" id="text_1" required="required" resumer-item value="item 1"/><br/><br/><input type="text" /></ugo-resumer>
+        </div>
+        <div id="item_2" ugo-collection-item class="has-error">
+            <ugo-resumer><h2>Item 2</h2><input type="text" id="text_2" required="required" resumer-item value="item 2"/><br/><br/><input type="text" /></ugo-resumer>
+        </div>
+    </ugo-collection>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        document.body.removeAttribute('unresolved');
+    }, false);
+</script>
+</body>
+</html>

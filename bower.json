@@ -1,6 +1,6 @@
 {
     "name": "ugo-collection",
-    "version": "0.0.1",
+    "version": "0.2",
     "authors": [
         "Florian Roy"
     ],
@@ -15,8 +15,8 @@
     ],
     "keywords": ["Polymer", "web-components", "html", "form", "collection", "symfony"],
     "dependencies": {
-        "polymer": "Polymer/polymer#^0.5",
-        "core-selector": "Polymer/core-selector",
+        "polymer": "Polymer/polymer#^0.8.0-rc.4",
+        "core-selector": "Polymer/core-selector#0.8-preview",
         "ugo-resumer": "git@github.com:display-interactive/ugo-resumer.git"
     },
     "devDependencies": {

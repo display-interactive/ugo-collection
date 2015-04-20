@@ -1,315 +1,445 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-selector/core-selector.html">
 
-<polymer-element name="ugo-collection" attributes="selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass nestedErrorSelector">
+<dom-module id="ugo-collection">
+    <link rel="stylesheet" href="ugo-collection.css">
     <template>
-        <link rel="stylesheet" href="ugo-collection.css" shim-shadowdom>
         <div class="ugo-collection-menu">
-            <core-selector id="list" class="ugo-collection-list" selected="{{selected}}">
-                <template repeat="{{item, index in menuItems}}">
-                    <div data-error?="{{item.hasError}}">
-                        {{item.title}}
-                        <button type="button" on-tap="{{removeItem}}" ugo-collection-index="{{index}}">{{removeText}}</button>
+            <core-selector id="list" class="ugo-collection-list" selected="{{selected}}" on-tap="removeItem">
+                <template is="x-repeat" items="{{menuItems}}">
+                    <div data-error$="{{item.hasError}}"><span>{{item.title}}</span>
+                        <button type="button" data-id$="{{item.id}}">{{item.removeText}}</button>
                         <div class="ugo-collection-arrow"></div>
                     </div>
                 </template>
             </core-selector>
-            <button id="add" disabled?="{{ disabledAdd }}" on-tap="{{addItem}}">{{addText}}</button>
+            <button id="add" disabled$="{{disabledAdd}}" on-tap="addItem">{{addText}}</button>
         </div>
-        <content id="items" select="{{itemSelector}}"></content>
+        <content id="items" select="[ugo-collection-item]"></content>
     </template>
-    <script>
-        Polymer('ugo-collection', {
+</dom-module>
+<script>
+    Polymer({
+        is: 'ugo-collection',
+        //selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass nestedErrorSelector
 
-            /**
-             * selected index
-             *
-             * @type {Number}
-             */
-            selected: -1,
-
+        /**
+         * @warning Properties order is important !
+         */
+        properties: {
             /**
              * Text on add button
-             * @type {String}
              */
-            addText: 'add',
+            addText: {
+                type: String,
+                value: 'add'
+            },
 
             /**
              * Text on remove buttons
-             * @type {String}
              */
-            removeText: 'remove',
+            removeText: {
+                type: String,
+                value: 'remove',
+                observer: 'removeTextChanged'
+            },
 
             /**
              * Text on create
-             *
-             * @type {String}
              */
-            createText: 'Editing...',
-
-            prototypeAttribute: 'data-prototype',
-            prototypeProperty: '__name__',
-            itemSelector: '[ugo-collection-item]',
-            itemAttribute: 'ugo-collection-item',
-            itemSelectedClass: 'ugo-collection-selected',
+            createText: {
+                type: String,
+                value: 'Editing...'
+            },
 
             /**
-             * class used to ma
+             * property storing html used to generate collection's item
              */
-            errorClass: 'has-error',
-            nestedErrorSelector: '.has-error',
+            prototypeAttribute: {
+                type: String,
+                value: 'data-prototype'
+            },
+
+            /**
+             * the part to parse in the html property
+             */
+            prototypeProperty: {
+                type: String,
+                value: '__name__'
+            },
+
+            /**
+             * use to identify collection items
+             */
+            itemAttribute: {
+                type: String,
+                value: 'ugo-collection-item'
+            },
+
+            /**
+             * class used to mark collection's item selected
+             */
+            itemSelectedClass: {
+                type: String,
+                value: 'ugo-collection-selected'
+            },
+
+            /**
+             * Error class
+             */
+            errorClass: {
+                type: String,
+                value: 'has-error'
+            },
+
+            /**
+             * nestedErrorSelector
+             */
+            nestedErrorSelector: {
+                type: String,
+                value: '.has-error'
+            },
+
+            /**
+             * selected index
+             */
+            selected: {
+                type: Number,
+                value: -1,
+                observer: 'selectedChanged'
+            },
 
             /**
              * Property use to disable the add button
-             * @type {Boolean}
              */
-            disabledAdd: false,
-
-            /**
-             * Array containing menus items
-             * @return {Array}
-             */
-            menuItems: [],
-
-            /**
-             * init
-             */
-            ready: function() {
-                this.index = this.items.length;
-                this.prev = null;
-                this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
+            disabledAdd: {
+                type: Boolean,
+                value: false,
+                readOnly: true
             },
 
             /**
-             * Rebuild menu on dom ready
+             * Property use to disable the add button
              */
-            domReady: function() {
-                var selectedChanged = false;
-                this.menuItems = [];
-                [].forEach.call(this.items, function(item, index) {
-                    var hasError = this.hasErrorClass(index);
-                    this.menuItems.push({title: this.getTitle(item, index), hasError: hasError});
-                    if (hasError && !selectedChanged) {
-                        this.selected = index;
-                        selectedChanged = true;
-                    }
-                }.bind(this));
-            },
-
-            /**
-             * Add item to the collection
-             */
-            addItem: function() {
-                //if active item is not valid: avoid addItem
-                if (this.items[this.selected] != undefined && !this.isValid(this.selected)) return;
-
-                var prototype = this.getAttribute(this.prototypeAttribute);
-
-                //get prototype markup, parse it
-                var re = new RegExp(this.prototypeProperty, 'g');
-                var item = this.createNodeFromString(prototype.replace(re, this.index));
-
-                //increment index
-                this.index += 1;
-
-                //add to html and add display it
-                this.appendChild(item);
-                item.classList.add(this.errorClass);
-                this.menuItems.push({title: this.createText, hasError: true});
-                //select last
-                this.selected = this.items.length -1;
-                this.disabledAdd = true;
-            },
-
-            /**
-             * Remove item from the collection
-             */
-            removeItem: function(event) {
-                var index = event.target.getAttribute('ugo-collection-index');
-                if (!index) return;
-
-                var item = this.items[index];
-                item.parentNode.removeChild(item);
-                item.classList.remove(this.errorClass);
-
-                //delete menu items
-                delete this.menuItems[index];
-                //rebase keys
-                var newArr = [];
-                this.menuItems.forEach(function (item) {
-                    newArr.push(item);
-                });
-                this.menuItems = newArr;
-
-                //set selected to -1 if the deleted item is selected
-                if (this.selected === parseInt(index)) {
-                    this.selected = -1;
-                    this.disabledAdd = false;
-                }
-
-                event.stopPropagation();
-            },
-
-            /**
-             * Returns an array of all items.
-             *
-             * @property items
-             */
-            get items() {
-                return this.$.items.getDistributedNodes();
-            },
-
-            /**
-             * on selected property changed
-             * @private
-             */
-            selectedChanged: function(oldValue, newValue) {
-                if (-1 == oldValue || this.isValid(oldValue)) {
-                    var selectedFound = false;
-                    for (var i = 0; i < this.items.length; i++) {
-                        //remove all error class
-
-                        if (i == this.selected) {
-                            selectedFound = true;
-                            this.items[i].classList.add(this.itemSelectedClass);
-                            this.addListeners(this.items[i]);
-                        } else {
-                            this.items[i].classList.remove(this.itemSelectedClass);
-                            this.removeListeners(this.items[i]);
-                        }
-                    }
-
-                    //if we didn't selected an item we set selected to -1
-                    if (!selectedFound) {
-                        this.selected = -1;
-                    }
-
-                    this.prev = null; //no more prevs
-                } else if (this.prev !== this.selected && undefined != this.items[oldValue]) {
-                    //we reset the selected value because the active item is invalid
-                    //the store the oldValue to avoid infinite loop
-                    //because this.selected = xxx trigger selectedChanged()
-                    this.items[oldValue].classList.add(this.errorClass);
-                    this.selected = oldValue;
-                    this.prev = oldValue;
-                }
-            },
-
-            /**
-             * Menu display or not with menuItems changes
-             */
-            menuItemsChanged: function() {
-                this.$.list.style.display = this.menuItems.length > 0 ? 'block' : 'none';
-            },
-
-            /**
-             * Create a Node from a string
-             *
-             * @param {string} str
-             * @returns {Node}
-             * @private
-             */
-            createNodeFromString: function(str) {
-                var div = document.createElement('div');
-                div.innerHTML = str;
-
-                return div.firstChild;
-            },
-
-            /**
-             * Check if the active item is valid
-             *
-             * @return {Boolean}
-             * @private
-             */
-            isValid: function(oldValue) {
-                var item = this.items[oldValue];
-                if (!item) return false;
-
-                var elements = item.querySelectorAll('input, textarea, select');
-
-                var isValid = true;
-                [].forEach.call(elements, function(element) {
-                    if (!element.validity.valid) {
-                        isValid = false;
-                    }
-                });
-
-                return isValid;
-            },
-
-            /**
-             * Check if given item has error class so that it's marked as errored externaly
-             *
-             * @private
-             */
-            hasErrorClass: function(value) {
-                var item = this.items[value];
-                if (!item) return false;
-
-                if (item.classList.contains('has-error') || item.querySelectorAll(this.nestedErrorSelector).length > 0)
-                    return true;
-
-                return false;
-            },
-
-
-            /**
-             * Get resume for ugo-resumer if exists or get Index
-             *
-             * @return {String}
-             */
-            getTitle: function(item, index) {
-                var resumer = item.querySelector('ugo-resumer');
-                if (resumer && resumer.resume != undefined && resumer.resume) {
-                    return resumer.resume;
-                } else {
-                    return index;
-                }
-            },
-
-            /**
-             * Add listeners
-             * @private
-             */
-            addListeners: function(item) {
-                var resumer = item.querySelector('ugo-resumer');
-                if (resumer) {
-                    Polymer.addEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
-                }
-            },
-
-            /**
-             * Remove listeners
-             * @private
-             */
-            removeListeners: function(item) {
-                var resumer = item.querySelector('ugo-resumer');
-                if (resumer) {
-                    Polymer.removeEventListener(resumer, 'ugo-resumer-change', this.resumerChangeListener);
-                }
-            },
-
-            /**
-             * ugo-resumer-change to update list
-             * @param event
-             */
-            onResumerChangeHandler: function(event) {
-                var menuItem = this.menuItems[this.selected];
-                if (undefined != menuItem) {
-                    menuItem.title = this.getTitle(event.target.parentNode, this.selected);
-
-                    if (this.isValid(this.selected)) {
-                        this.disabledAdd = false;
-                        event.target.parentNode.classList.remove(this.errorClass);
-                        menuItem.hasError = false;
-                    } else {
-                        this.disabledAdd = true;
-                        event.target.parentNode.classList.add(this.errorClass);
-                        menuItem.hasError = true;
-                    }
-                }
+            menuItems: {
+                type: Array,
+                value: [],
+                readOnly: true,
+                notify: true,
+                observer: 'menuItemsChanged'
             }
-        });
-    </script>
-</polymer-element>
+        },
+
+        /**
+         * job interval
+         */
+        interval: 500,
+
+        /**
+         * Date of the last job launched
+         *
+         * @type Object
+         */
+        jobs: {},
+        /**
+         * timers to launch the last jobs
+         *
+         * @type Object
+         */
+        timers: {},
+
+        /**
+         * init
+         */
+        ready: function() {
+            this.index = this.items.length;
+            this.prev = null;
+            this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
+            window.addEventListener('DOMContentLoaded', this.domReady.bind(this));
+        },
+
+        /**
+         * domReady emulation
+         */
+        domReady: function() {
+            var selectedChanged = false;
+            var menuItems = [];
+            [].forEach.call(this.items, function(item, index) {
+                var hasError = this.hasErrorClass(index);
+                menuItems.push({id: menuItems.length, title: this.getTitle(item, index), hasError: hasError, removeText: this.removeText});
+                if (hasError && !selectedChanged) {
+                    this.selected = index;
+                    selectedChanged = true;
+                }
+            }.bind(this));
+
+            this._setItems(menuItems);
+        },
+
+        /**
+         * Add item to the collection
+         */
+        addItem: function() {
+            //if active item is not valid: avoid addItem
+            if (this.items[this.selected] != undefined && !this.isValid(this.selected)) return;
+
+            var prototype = this.getAttribute(this.prototypeAttribute);
+
+            //get prototype markup, parse it
+            var re = new RegExp(this.prototypeProperty, 'g');
+            var item = this.createNodeFromString(prototype.replace(re, this.index));
+
+            //increment index
+            this.index += 1;
+
+            //add to html and add display it
+            Polymer.dom(this).appendChild(item);
+            item.classList.add(this.errorClass);
+            var menuItems = this.menuItems.slice();
+            menuItems.push({id: this.menuItems.length, title: this.createText, hasError: true, removeText: this.removeText});
+            this._setItems(menuItems);
+            //select last
+            this.selected = this.items.length -1;
+            this._setDisabledAdd(true);
+        },
+
+        /**
+         * Remove item from the collection
+         */
+        removeItem: function(event) {
+            var id = event.target.getAttribute('data-id');
+            if (!id) return;
+
+            var item = this.items[id];
+            Polymer.dom(item.parentNode).removeChild(item);
+            item.classList.remove(this.errorClass);
+
+            //delete menu items
+            var menuItems = this.menuItems.slice();
+            delete menuItems[id];
+            //rebase keys
+            var newArr = [];
+            menuItems.forEach(function (item) {
+                item.id = newArr.length;
+                newArr.push(item);
+            });
+            this._setItems(newArr);
+
+            //set selected to -1 if the deleted item is selected
+            if (this.selected === parseInt(id)) {
+                this.selected = -1;
+                this._setDisabledAdd(false);
+            }
+
+            event.stopPropagation();
+        },
+
+        /**
+         * Returns an array of all items.
+         *
+         * @property items
+         */
+        get items() {
+            return Polymer.dom(this.$.items).getDistributedNodes();
+        },
+
+        /**
+         * on selected property changed
+         */
+        selectedChanged: function(oldValue, newValue) {
+            if (-1 == oldValue || this.isValid(oldValue)) {
+                var selectedFound = false;
+                for (var i = 0; i < this.items.length; i++) {
+                    //remove all error class
+
+                    if (i == this.selected) {
+                        selectedFound = true;
+                        this.items[i].classList.add(this.itemSelectedClass);
+                        this.addListeners(this.items[i]);
+                    } else {
+                        this.items[i].classList.remove(this.itemSelectedClass);
+                        this.removeListeners(this.items[i]);
+                    }
+                }
+
+                //if we didn't selected an item we set selected to -1
+                if (!selectedFound) {
+                    this.selected = -1;
+                }
+
+                this.prev = null; //no more prevs
+            } else if (this.prev !== this.selected && undefined != this.items[oldValue]) {
+                //we reset the selected value because the active item is invalid
+                //the store the oldValue to avoid infinite loop
+                //because this.selected = xxx trigger selectedChanged()
+                this.items[oldValue].classList.add(this.errorClass);
+                this.selected = oldValue;
+                this.prev = oldValue;
+            }
+        },
+
+        /**
+         * Menu display or not with menuItems changes
+         */
+        menuItemsChanged: function() {
+            this.$.list.style.display = this.menuItems.length > 0 ? 'block' : 'none';
+        },
+
+        /**
+         * When removeText change we need to reset the full array of menuItems
+         */
+        removeTextChanged: function() {
+            if (!this.menuItems || 0 === this.menuItems.length) return;
+
+            var menuItems = this.menuItems.slice();
+            for (var i = 0; i < menuItems.length; i++) {
+                menuItems[i].removeText = this.removeText;
+            }
+            this._setItems(menuItems);
+        },
+
+
+        /**
+         * Create a Node from a string
+         *
+         * @param {string} str
+         * @returns {Node}
+         * @private
+         */
+        createNodeFromString: function(str) {
+            var div = document.createElement('div');
+            div.innerHTML = str;
+
+            return div.firstChild;
+        },
+
+        /**
+         * Check if the active item is valid
+         *
+         * @return {Boolean}
+         * @private
+         */
+        isValid: function(oldValue) {
+            var item = this.items[oldValue];
+            if (!item) return false;
+
+            var elements = Polymer.dom(item).querySelectorAll('input, textarea, select');
+
+            var isValid = true;
+            [].forEach.call(elements, function(element) {
+                if (!element.validity.valid) {
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        },
+
+        /**
+         * Check if given item has error class so that it's marked as errored externaly
+         *
+         * @private
+         */
+        hasErrorClass: function(value) {
+            var item = this.items[value];
+            if (!item) return false;
+
+            return item.classList.contains('has-error') || Polymer.dom(item).querySelectorAll(this.nestedErrorSelector).length > 0;
+        },
+
+
+        /**
+         * Get resume for ugo-resumer if exists or get Index
+         *
+         * @return {String}
+         */
+        getTitle: function(item, index) {
+            var resumer = Polymer.dom(item).querySelector('ugo-resumer');
+
+            if (resumer && resumer.resume != undefined && resumer.resume) {
+                return resumer.resume;
+            } else {
+                return index;
+            }
+        },
+
+        /**
+         * Add listeners
+         * @private
+         */
+        addListeners: function(item) {
+            var resumer = Polymer.dom(item).querySelector('ugo-resumer');
+            if (resumer) {
+                resumer.addEventListener('resumerChange', this.resumerChangeListener);
+            }
+        },
+
+        /**
+         * Remove listeners
+         * @private
+         */
+        removeListeners: function(item) {
+            var resumer = item.querySelector('ugo-resumer');
+            if (resumer) {
+                resumer.removeEventListener('resumerChange', this.resumerChangeListener);
+            }
+        },
+
+        /**
+         * ugo-resumer-change to update list
+         * @param event
+         */
+        onResumerChangeHandler: function(event) {
+            var menuItems = this.menuItems.slice(),
+                menuItem = menuItems[this.selected];
+
+            if (undefined != menuItem) {
+                menuItem.title = this.getTitle(event.target.parentNode, this.selected);
+
+                if (this.isValid(this.selected)) {
+                    this._setDisabledAdd(false);
+                    event.target.parentNode.classList.remove(this.errorClass);
+                    menuItem.hasError = false;
+                } else {
+                    this._setDisabledAdd(true);
+                    event.target.parentNode.classList.add(this.errorClass);
+                    menuItem.hasError = true;
+                }
+
+                this._setItems(menuItems);
+            }
+        },
+
+
+        /**
+         * Handle the missing polymer job fonction
+         *
+         * @param {String} name
+         * @param {Function} method
+         * @param {Number} interval
+         */
+        job: function(name, method, interval) {
+            if (undefined === this.jobs[name] || (Date.now() - this.jobs[name]) > interval) {
+                method();
+                this.jobs[name] = Date.now();
+            } else if (this.jobs[name]) {
+                if (this.timers[name]) clearTimeout(this.timers[name]);
+                this.timers[name] = setTimeout(function() {
+                    method();
+                }, Date.now() - this.jobs[name]);
+            }
+        },
+
+        /**
+         * Use to force change trigger en menuItems
+         */
+        _setItems: function(items) {
+            this.job('setItems', function() {
+                this._setMenuItems([]);
+                setTimeout(function() {
+                    this._setMenuItems(items);
+                }.bind(this), 1)
+            }.bind(this), this.interval);
+        }
+    });
+</script>
