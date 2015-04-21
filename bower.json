@@ -15,9 +15,9 @@
     ],
     "keywords": ["Polymer", "web-components", "html", "form", "collection", "symfony"],
     "dependencies": {
-        "polymer": "Polymer/polymer#^0.5",
+        "polymer": "Polymer/polymer#0.5.*",
         "core-selector": "Polymer/core-selector",
-        "ugo-resumer": "git@github.com:display-interactive/ugo-resumer.git"
+        "ugo-resumer": "git@github.com:display-interactive/ugo-resumer.git#0.1"
     },
     "devDependencies": {
         "web-component-tester": "*"
