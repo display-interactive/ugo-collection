@@ -46,7 +46,9 @@
 
         test('List initialize', function (done) {
             setTimeout(function() {
-                assert.equal(3, el.menuItems.length);
+                var list = el.$.list;
+                console.log(el.$.list);
+                assert.equal(3, Polymer.dom(list).querySelectorAll('div').length);
                 done();
             }, 500);
         });
