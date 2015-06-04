@@ -9,9 +9,8 @@
     <script src="../../webcomponentsjs/webcomponents.min.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../../polymer/polymer.html">
-    <link rel="import" href="../ugo-collection.html">
     <link rel="import" href="../../ugo-resumer/ugo-resumer.html">
+    <link rel="import" href="../ugo-collection.html">
 </head>
 
 <body>
@@ -19,8 +18,8 @@
 <form id="form">
     <ugo-collection id="typical" create-text="test123" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
         <div id="item_0" ugo-collection-item><ugo-resumer><h2>Item 0</h2><input type="text" resumer-item id="text_0" required="required" value="test" /></ugo-resumer></div>
-        <div id="item_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" /></ugo-resumer></div>
-        <div id="item_2" ugo-collection-item><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" /></ugo-resumer></div>
+        <div id="item_1" ugo-collection-item><ugo-resumer><h2>Item 1</h2><input type="text" resumer-item id="text_1" required="required" value="1" /></ugo-resumer></div>
+        <div id="item_2" ugo-collection-item><ugo-resumer><h2>Item 2</h2><input type="text" resumer-item id="text_2" required="required" value="2" /></ugo-resumer></div>
     </ugo-collection>
 
     <br/>
@@ -44,13 +43,9 @@
             assert.isNotNull(el);
         });
 
-        test('List initialize', function (done) {
-            setTimeout(function() {
-                var list = el.$.list;
-                console.log(el.$.list);
-                assert.equal(3, Polymer.dom(list).querySelectorAll('div').length);
-                done();
-            }, 500);
+        test('List initialize', function () {
+            assert.equal(3, document.querySelectorAll('#typical iron-selector .iron-selector-item').length);
+            assert.equal(3, Polymer.dom(el.root).querySelectorAll('iron-selector .iron-selector-item').length);
         });
 
         test('getTitle', function () {
@@ -61,13 +56,11 @@
             assert.equal(true, el.isValid(el.selected))
         });
 
-        test('addItem', function (done) {
+        test('addItem', function () {
             el.addItem();
-            setTimeout(function() {
-                assert.equal(4, el.menuItems.length);
-                assert.equal('test123', el.menuItems[el.menuItems.length - 1].title);
-                done();
-            }, 500);
+            assert.equal(4, el.menuItems.length);
+            assert.equal(4, el.items.length);
+            assert.equal('test123', el.menuItems[el.menuItems.length - 1].title);
         });
 
         test('isValid2', function() {
@@ -81,6 +74,7 @@
         test('select right item', function() {
             document.querySelector('#item_0').classList.contains(el.itemSelectedClass);
         });
+
 
         test('test reset selected and errorClass', function(done) {
             //el.selected = 1;

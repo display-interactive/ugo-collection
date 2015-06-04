@@ -6,7 +6,7 @@ ugo-collection {
     margin-bottom: 10px;
 }
 
-.ugo-collection-list .core-selected {
+.ugo-collection-list .iron-selected {
     font-weight: bold;
 }
 
@@ -38,7 +38,7 @@ ugo-collection {
     padding-right: 35px;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector {
     display: block;
     min-height: 68px;
     border: 1px solid #ccc;
@@ -53,17 +53,17 @@ ugo-collection {
     font-size: 1.3rem;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector:before,
-:host(.ugo-theme) > .ugo-collection-menu > core-selector:after {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector:before,
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector:after {
     display: table;
     content: " ";
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector:after {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector:after {
     clear:both;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div {
     position: relative;
     height: 34px;
     padding: 7px 7px 7px 15px;
@@ -76,47 +76,47 @@ ugo-collection {
     box-sizing: border-box;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div:first-of-type {
     border-radius: 4px 4px 0 0;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error] {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div[data-error] {
     color: #a94442;
     background-color: #ffebeb;
 
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error]:nth-child(odd) {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div[data-error]:nth-child(odd) {
     background-color: #f2dede;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error].core-selected {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div[data-error].iron-selected {
     background-color: #a94442;
     color: #fff;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-of-child {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div:last-of-child {
     border-radius: 0 0 4px 4px;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:nth-child(odd) {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div:nth-child(odd) {
     background-color: #f9f9f9;
 }
 
 
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div.core-selected {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div.iron-selected {
     position: relative;
     background-color: #D7E1EB;
     font-weight: normal;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div .ugo-collection-arrow {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div .ugo-collection-arrow {
     display: none;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div.core-selected .ugo-collection-arrow {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div.iron-selected .ugo-collection-arrow {
     display: block;
     position: absolute;
     top: 0;
@@ -128,16 +128,16 @@ ugo-collection {
     border-color: transparent transparent transparent #D7E1EB;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div[data-error].core-selected .ugo-collection-arrow {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div[data-error].iron-selected .ugo-collection-arrow {
     border-color: transparent transparent transparent #a94442;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:first-of-type .ugo-collection-arrow {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div:first-of-type .ugo-collection-arrow {
     top: 1px;
     border-width: 16px 0 16px 15px;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div:last-of-type .ugo-collection-arrow {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div:last-of-type .ugo-collection-arrow {
     top: 1px;
     border-width: 16px 0 16px 15px;
 }
@@ -192,7 +192,7 @@ ugo-collection {
     opacity: 0.3;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div > button {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div > button {
     position: absolute;
     z-index: 10;
     top: 8px;
@@ -212,7 +212,7 @@ ugo-collection {
     color: #00468C;
 }
 
-:host(.ugo-theme) > .ugo-collection-menu > core-selector > div > button:before {
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div > button:before {
     content: "\e014";
     font-size: 1.4rem;
     background: none;

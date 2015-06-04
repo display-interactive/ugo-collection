@@ -1,18 +1,18 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../core-selector/core-selector.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
 
 <dom-module id="ugo-collection">
     <link rel="import" type="css" href="ugo-collection.css">
     <template>
         <div class="ugo-collection-menu">
-            <core-selector id="list" class="ugo-collection-list" selected="{{selected}}" on-tap="removeItem">
-                <template is="x-repeat" items="{{menuItems}}">
-                    <div data-error$="{{item.hasError}}"><span>{{item.title}}</span>
-                        <button type="button" data-id$="{{item.id}}">{{item.removeText}}</button>
+            <iron-selector id="list" class="ugo-collection-list" selected="{{selected}}" on-tap="removeItem">
+                <template is="dom-repeat" items="{{menuItems}}" index-as="id">
+                    <div class="iron-selector-item" data-error$="{{item.hasError}}"><span>{{item.title}}</span>
+                        <button type="button" data-id$="{{id}}">{{item.removeText}}</button>
                         <div class="ugo-collection-arrow"></div>
                     </div>
                 </template>
-            </core-selector>
+            </iron-selector>
             <button id="add" disabled$="{{disabledAdd}}" on-tap="addItem">{{addText}}</button>
         </div>
         <content id="items" select="[ugo-collection-item]"></content>
@@ -21,7 +21,6 @@
 <script>
     Polymer({
         is: 'ugo-collection',
-        //selected addText createText removeText prototypeAttribute prototypeProperty itemSelector itemAttribute itemSelectedClass errorClass nestedErrorSelector
 
         /**
          * @warning Properties order is important !
@@ -141,27 +140,13 @@
         interval: 500,
 
         /**
-         * Date of the last job launched
-         *
-         * @type Object
-         */
-        jobs: {},
-        /**
-         * timers to launch the last jobs
-         *
-         * @type Object
-         */
-        timers: {},
-
-        /**
          * init
          */
         ready: function() {
-            this.index = this.items.length;
             this.prev = null;
             this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
-            window.addEventListener('DOMContentLoaded', this.domReady.bind(this));
 
+            setTimeout(this.domReady.bind(this), 1); //wait 1ms
         },
 
         /**
@@ -172,13 +157,13 @@
             var menuItems = [];
             [].forEach.call(this.items, function(item, index) {
                 var hasError = this.hasErrorClass(index);
-                menuItems.push({id: menuItems.length, title: this.getTitle(item, index), hasError: hasError, removeText: this.removeText});
+                menuItems.push({title: this.getTitle(item, index), hasError: hasError, removeText: this.removeText});
                 if (hasError && !selectedChanged) {
                     this.selected = index;
                     selectedChanged = true;
                 }
             }.bind(this));
-            this._setItems(menuItems);
+            this._setMenuItems(menuItems);
         },
 
         /**
@@ -192,18 +177,16 @@
 
             //get prototype markup, parse it
             var re = new RegExp(this.prototypeProperty, 'g');
-            var item = this.createNodeFromString(prototype.replace(re, this.index));
-
-            //increment index
-            this.index += 1;
+            var item = this.createNodeFromString(prototype.replace(re, this.items.length));
 
             //add to html and add display it
             Polymer.dom(this).appendChild(item);
             Polymer.dom.flush();
+
             item.classList.add(this.errorClass);
-            var menuItems = this._cloneMenuItems();
-            menuItems.push({id: menuItems.length, title: this.createText, hasError: true, removeText: this.removeText});
-            this._setItems(menuItems);
+            var menuItems = this.menuItems.slice();
+            menuItems.push({title: this.createText, hasError: true, removeText: this.removeText});
+            this._setMenuItems(menuItems);
             //select last
             this.selected = this.items.length -1;
             this._setDisabledAdd(true);
@@ -221,7 +204,7 @@
             Polymer.dom.flush();
 
             //delete menu items
-            var menuItems = this._cloneMenuItems();
+            var menuItems = this.menuItems.slice();
             delete menuItems[id];
             //rebase keys
             var newArr = [];
@@ -229,7 +212,7 @@
                 el.id = newArr.length;
                 newArr.push(el);
             });
-            this._setItems(newArr);
+            this._setMenuItems(newArr);
 
             //set selected to -1 if the deleted item is selected
             if (this.selected === parseInt(id)) {
@@ -297,11 +280,9 @@
         removeTextChanged: function() {
             if (!this.menuItems || 0 === this.menuItems.length) return;
 
-            var menuItems = this._cloneMenuItems();
-            for (var i = 0; i < menuItems.length; i++) {
-                menuItems[i].removeText = this.removeText;
+            for (var i = 0; i < this.menuItems.length; i++) {
+                this.set('menuItems.'+i+'.removeText', this.removeText);
             }
-            this._setItems(menuItems);
         },
 
 
@@ -362,8 +343,8 @@
         getTitle: function(item, index) {
             var resumer = Polymer.dom(item).querySelector('ugo-resumer');
 
-            if (resumer && resumer.resume != undefined && resumer.resume) {
-                return resumer.resume;
+            if (resumer && resumer.resume != undefined) {
+                return resumer.resume ? resumer.resume : this.createText;
             } else {
                 return index;
             }
@@ -385,7 +366,7 @@
          * @private
          */
         removeListeners: function(item) {
-            var resumer = item.querySelector('ugo-resumer');
+            var resumer = Polymer.dom(item).querySelector('ugo-resumer');
             if (resumer) {
                 resumer.removeEventListener('resumerChange', this.resumerChangeListener);
             }
@@ -393,66 +374,22 @@
 
         /**
          * ugo-resumer-change to update list
-         * @param event
+         * @param {CustomEvent} event
          */
         onResumerChangeHandler: function(event) {
-            var menuItems = this._cloneMenuItems(),
-                menuItem = menuItems[this.selected];
-
-            if (undefined != menuItem) {
-                menuItem.title = this.getTitle(event.target.parentNode, this.selected);
-
+            if (undefined != this.menuItems[this.selected]) {
+                var baseKey = 'menuItems.'+this.selected;
+                this.set(baseKey+'.title', this.getTitle(event.target.parentNode, this.selected));
                 if (this.isValid(this.selected)) {
                     this._setDisabledAdd(false);
                     event.target.parentNode.classList.remove(this.errorClass);
-                    menuItem.hasError = false;
+                    this.set(baseKey+'.hasError', false);
                 } else {
                     this._setDisabledAdd(true);
                     event.target.parentNode.classList.add(this.errorClass);
-                    menuItem.hasError = true;
+                    this.set(baseKey+'.hasError', true);
                 }
-
-                this._setItems(menuItems);
             }
-        },
-
-
-        /**
-         * Handle the missing polymer job fonction
-         *
-         * @param {String} name
-         * @param {Function} method
-         * @param {Number} interval
-         */
-        job: function(name, method, interval) {
-            if (undefined === this.jobs[name] || (Date.now() - this.jobs[name]) > interval) {
-                method();
-                this.jobs[name] = Date.now();
-            } else if (this.jobs[name]) {
-                if (this.timers[name]) clearTimeout(this.timers[name]);
-                this.timers[name] = setTimeout(function() {
-                    method();
-                }, Date.now() - this.jobs[name]);
-            }
-        },
-
-        /**
-         * Clone menuItems
-         */
-        _cloneMenuItems: function() {
-            return this.menuItems ? this.menuItems.slice() : [];
-        },
-
-        /**
-         * Use to force change trigger en menuItems
-         */
-        _setItems: function(items) {
-            this.job('setItems', function() {
-                this._setMenuItems([]);
-                setTimeout(function() {
-                    this._setMenuItems(items);
-                }.bind(this), 1)
-            }.bind(this), this.interval);
         }
     });
 </script>
