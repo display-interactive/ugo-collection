@@ -24,6 +24,7 @@
 
     <br/>
     <hr>
+    <
     <ugo-collection class="ugo-theme" id="empty" selected="0" data-prototype="<div id=&quot;item___name__&quot; ugo-collection-item><ugo-resumer><h2>Item __name__</h2><input type=&quot;text&quot; id=&quot;text___name__&quot; resumer-item required=&quot;required&quot; /></ugo-resumer></div>">
     </ugo-collection>
     <hr>
@@ -54,6 +55,11 @@
 
         test('isValid', function() {
             assert.equal(true, el.isValid(el.selected))
+        });
+
+        test('selected', function() {
+            var items = Polymer.dom(el.root).querySelectorAll('iron-selector .iron-selector-item');
+            assert.equal(true, items[el.selected].classList.contains('iron-selected'))
         });
 
         test('addItem', function () {

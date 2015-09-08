@@ -6,7 +6,7 @@
     <template>
         <div class="ugo-collection-menu">
             <iron-selector id="list" class="ugo-collection-list" selected="{{selected}}" on-tap="removeItem">
-                <template is="dom-repeat" items="{{menuItems}}" index-as="id">
+                <template is="dom-repeat" items="{{menuItems}}" index-as="id" on-dom-change="onListRender">
                     <div class="iron-selector-item" data-error$="{{item.hasError}}"><span>{{item.title}}</span>
                         <button type="button" data-id$="{{id}}">{{item.removeText}}</button>
                         <div class="ugo-collection-arrow"></div>
@@ -146,24 +146,29 @@
             this.prev = null;
             this.resumerChangeListener = this.onResumerChangeHandler.bind(this);
 
-            setTimeout(this.domReady.bind(this), 1); //wait 1ms
+            this.async(function() {
+                var selectedChanged = false;
+                var menuItems = [];
+                [].forEach.call(this.items, function(item, index) {
+                    var hasError = this.hasErrorClass(index);
+                    menuItems.push({title: this.getTitle(item, index), hasError: hasError, removeText: this.removeText});
+                    if (hasError && !selectedChanged) {
+                        this.selected = index;
+                        selectedChanged = true;
+                    }
+                }.bind(this));
+                this._setMenuItems(menuItems);
+            });
         },
 
         /**
-         * domReady emulation
+         * Dom repeat render event
+         * We need to to this because the selected value is selected to fast
          */
-        domReady: function() {
-            var selectedChanged = false;
-            var menuItems = [];
-            [].forEach.call(this.items, function(item, index) {
-                var hasError = this.hasErrorClass(index);
-                menuItems.push({title: this.getTitle(item, index), hasError: hasError, removeText: this.removeText});
-                if (hasError && !selectedChanged) {
-                    this.selected = index;
-                    selectedChanged = true;
-                }
-            }.bind(this));
-            this._setMenuItems(menuItems);
+        onListRender: function() {
+            var selected = this.selected;
+            this.$.list.select(-1);
+            this.$.list.select(selected);
         },
 
         /**
@@ -265,6 +270,11 @@
                 this.prev = oldValue; //be carefull this.prev assignation must be before this.selected assignation to avoid infinite loop
                 this.selected = oldValue;
             }
+
+            /*this.async(function() {
+                this.$.list.selected = this.selected;
+            }, 1);*/
+
         },
 
         /**
