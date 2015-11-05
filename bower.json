@@ -15,7 +15,7 @@
     ],
     "keywords": ["Polymer", "web-components", "html", "form", "collection", "symfony"],
     "dependencies": {
-        "polymer": "Polymer/polymer#^1.1.*",
+        "polymer": "Polymer/polymer#^1.2.*",
         "iron-selector": "git@github.com:PolymerElements/iron-selector.git#^1.0.*",
         "ugo-resumer": "git@github.com:display-interactive/ugo-resumer.git"
     },
