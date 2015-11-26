@@ -192,6 +192,19 @@ ugo-collection {
     opacity: 0.3;
 }
 
+:host(.ugo-theme) > .ugo-collection-menu > iron-selector > div > span {
+    display: inline-block;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-right: 20px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 :host(.ugo-theme) > .ugo-collection-menu > iron-selector > div > button {
     position: absolute;
     z-index: 10;
