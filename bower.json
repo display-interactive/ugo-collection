@@ -5,7 +5,7 @@
         "Florian Roy"
     ],
     "description": "Polymer Element to handle special symfony collection",
-    "main": "element/*",
+    "main": "ugo-collection.html",
     "ignore": [
         "**/.*",
         "node_modules",
